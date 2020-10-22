@@ -16,7 +16,10 @@ if Delta > 0:
 	x2 = (-b+math.sqrt(Delta))/(2*a)
 	print("x1 = %f x2 = %f" %(x1, x2))
 else :
-	print("Delta negative")
-	
+	Delta = -Delta;
+	denum = 1/(2*a)
+	x1 = (-b/denum)
+	x2 = math.sqrt(Delta)
+	print("x1 = %f-j%f x2 = %f+j%f" %(x1,x2,x1,x2))
 
 
