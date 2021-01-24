@@ -13,7 +13,7 @@ def analytical_model(RTT, N, SRU, C):
         tStall = tStall + max((S/C +RTT - (2**(k-1)*S/C)), 0)
     return (2*RTT + N*SRU/C + tStall) 
 
-'''def fctf(X, a, b, c, d):
+    def fctf(X, a, b, c, d):
     x,y,z = X
     SRU = 256000*8
     S = 1446*8
@@ -30,7 +30,7 @@ def analytical_model(RTT, N, SRU, C):
         tau.append( a*x[k] + ( b * (y[k] /z[k] ) + som ) )
         som = 0
     return tau
-''' 
+
 
 
 SRU = 256000 * 8 # bits
@@ -64,7 +64,7 @@ for l in range(35):
 
 plt.plot(t, test)
 plt.show()
-'''
+
 test = []
 sol,cov = curve_fit(fctf, (RTT,N,C), fct_simu, abcd) 
-print(sol)'''
+print(sol)
