@@ -111,9 +111,12 @@ for i in range(start_line, start_line + nb_iteration): #35
 
 plotFIFO_mod3, = plt.plot(t, test3)
 plotsimuFIFO, = plt.plot(t, fct_simu)
-plt.legend([plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["modele analytique FIFO", "Modele 3 FIFO", 
-                                                      "Modele de simulation FIFO"])
+plotmodelOPT_FIFO, = plt.plot(t, mod1op)
 
+plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["Modele optimisé FIFO",
+                                                                    "Modele analytique FIFO", 
+                                                                    "Modele 3 FIFO ", 
+                                                                    "Modele de simulation FIFO"])
 
 plt.xlim(nb_iteration - 35,nb_iteration)
 plt.show()
@@ -141,8 +144,8 @@ fct_simu = fct_simu_FQ
 # calculs modele optimisé et modele 3
 test3 = []
 mod1op = []
-B1 = 305.5451
-B2 = 1.1590e+04
+B1 = 269.8423
+B2 = 1.1570e+04
 
 res = 0
 som = 0
@@ -177,8 +180,12 @@ for i in range(start_line_FQ, start_line_FQ + nb_iteration): #35
 
 plotFQ_mod3, = plt.plot(t, test3)
 plotsimuFQ, = plt.plot(t, fct_simu)
-plt.legend([plotAnalyFQ, plotFQ_mod3, plotsimuFQ],["Modele analytique FQ", "Modele 3 FQ ", 
-                                                    "Modele de simulation FQ"])
+plotmodelOPT_FQ, = plt.plot(t, mod1op)
+
+plt.legend([plotmodelOPT_FQ, plotAnalyFQ, plotFQ_mod3, plotsimuFQ],["Modele optimisé FQ",
+                                                                    "Modele analytique FQ", 
+                                                                    "Modele 3 FQ ", 
+                                                                    "Modele de simulation FQ"])
 
 
 plt.xlim(nb_iteration - 35,nb_iteration)
@@ -205,8 +212,8 @@ fct_simu = fct_simu_DCTCP
 # calculs modele optimisé et modele 3
 test3 = []
 mod1op = []
-B1 = 305.5451
-B2 = 1.1590e+04
+B1 = 1.0471e+03
+B2 = 1.1606e+04
 
 res = 0
 som = 0
@@ -240,10 +247,12 @@ for i in range(start_line_DCTCP, start_line_DCTCP + nb_iteration): #35
 
 plotDCTCP_mod3, = plt.plot(t, test3)
 plotsimuDCTCP, = plt.plot(t, fct_simu)
+plotmodelOPT_DCTCP, = plt.plot(t, mod1op)
 
-
-plt.legend([plotAnalyDCTCP, plotDCTCP_mod3, plotsimuDCTCP],["Modele analytique DCTCP", "Modele 3 DCTCP", 
-                                                      "Modele de simulation DCTCP"])
+plt.legend([plotmodelOPT_DCTCP, plotAnalyDCTCP, plotDCTCP_mod3, plotsimuDCTCP],["Modele optimisé DCTCP", 
+                                                                                "Modele analytique DCTCP",
+                                                                                "Modele 3 DCTCP", 
+                                                                                "Modele de simulation DCTCP"])
 
 
 plt.xlim(nb_iteration - 35,nb_iteration)
