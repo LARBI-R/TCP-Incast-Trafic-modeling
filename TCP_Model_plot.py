@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 from pandas_ods_reader import read_ods
 
-
+# close all figure
 plt.close("all")
 
+# getData -> CSV
 nb_iteration = 5200 #total lignes calc = 15493
 
 SRU = 256000 * 8 # bits
@@ -17,10 +18,6 @@ data = pd.read_csv('incast_all.csv')
 
 #test1 = read_ods("tableur_projet.ods",4)
 
-
-#test1_fct = test1.iloc[0:35,17]
-
-
 N = data.iloc[0:nb_iteration,9]
 C = 1e6 * data.iloc[0:nb_iteration, 5]
 B = data.iloc[0:nb_iteration, 8]
@@ -29,6 +26,8 @@ RTO = 1e-3 * data.iloc[0:nb_iteration, 4]
 
 fct_simu = 1e-3 * data.iloc[0:nb_iteration,11]
 
+
+# calculs modele optimisé et modele 3
 test3 = []
 mod1op = []
 B1 = 305.5451
@@ -41,10 +40,6 @@ res1 = 0
 
 err3 = []
 err1op = []
-
-fo = open("test3.txt", "w")
-
-
 
 for i in range(nb_iteration) : #35
     res1 = ( int( (N[i] * SRU) / S) + 1 ) * (S/C)
@@ -67,9 +62,8 @@ for i in range(nb_iteration) : #35
     test3.append(res)
     err1op.append(abs(mod1op[i]-fct_simu[i]))
     err3.append(abs(test3[i] - fct_simu[i]))
-    fo.write(str(res)+"\n")
 
-fo.close()
+# plot modeles, erreur
 
 #plt.plot(t, test1_cal)
 #plot1, = plt.plot(t, err3)
