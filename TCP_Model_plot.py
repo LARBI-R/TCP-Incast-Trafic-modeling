@@ -2,6 +2,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from pandas_ods_reader import read_ods
+import math
+
+def analytical_model(RTT, N, SRU, C):    
+    k = math.ceil(math.log((N*SRU/S)+1,2))
+    tStall = 0
+    for k in range(1, k):
+        tStall = tStall + max((S/C +RTT - (2**(k-1)*S/C)), 0)
+    return (2*RTT + N*SRU/C + tStall) 
+
+
 
 # close all figure
 plt.close("all")
@@ -52,6 +62,16 @@ RTO_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 4]
 
 
 # ------------------------ Reno - FIFO ------------------------ #
+# Calcul modele analytique (PROF)
+
+
+test =[]
+for l in range(start_line, start_line + nb_iteration):
+    test.append(analytical_model(RTT[l],N[l],SRU, C[l]))
+
+plotAnalyFIFO, = plt.plot(t, test)
+
+
 
 # calculs modele optimisé et modele 3
 test3 = []
@@ -91,7 +111,7 @@ for i in range(start_line, start_line + nb_iteration): #35
 
 plotFIFO_mod3, = plt.plot(t, test3)
 plotsimuFIFO, = plt.plot(t, fct_simu)
-plt.legend([plotFIFO_mod3, plotsimuFIFO],["Modele 3 FIFO", 
+plt.legend([plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["modele analytique FIFO", "Modele 3 FIFO", 
                                                       "Modele de simulation FIFO"])
 
 
@@ -100,6 +120,16 @@ plt.show()
 
 # ------------------------ Reno - FQ ------------------------ #
 
+# Calcul modele analytique (PROF)
+
+
+test =[]
+for l in range(start_line_FQ, start_line_FQ + nb_iteration):
+    test.append(analytical_model(RTT_FQ[l],N_FQ[l],SRU, C_FQ[l]))
+
+plotAnalyFQ, = plt.plot(t, test)
+
+# modele 3 et modele opt
 
 RTT = RTT_FQ
 C = C_FQ
@@ -147,7 +177,7 @@ for i in range(start_line_FQ, start_line_FQ + nb_iteration): #35
 
 plotFQ_mod3, = plt.plot(t, test3)
 plotsimuFQ, = plt.plot(t, fct_simu)
-plt.legend([plotFQ_mod3, plotsimuFQ],["Modele 3 FQ ", 
+plt.legend([plotAnalyFQ, plotFQ_mod3, plotsimuFQ],["Modele analytique FQ", "Modele 3 FQ ", 
                                                     "Modele de simulation FQ"])
 
 
@@ -155,6 +185,16 @@ plt.xlim(nb_iteration - 35,nb_iteration)
 plt.show()
 # ------------------------ DCTCP ------------------------ #
 
+# Calcul modele analytique (PROF)
+
+
+test =[]
+for l in range(start_line_DCTCP, start_line_DCTCP + nb_iteration):
+    test.append(analytical_model(RTT_DCTCP[l],N_DCTCP[l],SRU, C_DCTCP[l]))
+
+plotAnalyDCTCP, = plt.plot(t, test)
+
+# modele 3 et modele opt
 
 RTT = RTT_DCTCP
 C = C_DCTCP
@@ -200,7 +240,9 @@ for i in range(start_line_DCTCP, start_line_DCTCP + nb_iteration): #35
 
 plotDCTCP_mod3, = plt.plot(t, test3)
 plotsimuDCTCP, = plt.plot(t, fct_simu)
-plt.legend([plotDCTCP_mod3, plotsimuDCTCP],["Modele 3 DCTCP", 
+
+
+plt.legend([plotAnalyDCTCP, plotDCTCP_mod3, plotsimuDCTCP],["Modele analytique DCTCP", "Modele 3 DCTCP", 
                                                       "Modele de simulation DCTCP"])
 
 

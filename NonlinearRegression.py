@@ -5,14 +5,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-def analytical_model(RTT, N, SRU, C):    
-    k = math.ceil(math.log((N*SRU/S)+1,2))
-    tStall = 0
-    for k in range(1, k):
-        tStall = tStall + max((S/C +RTT - (2**(k-1)*S/C)), 0)
-    return (2*RTT + N*SRU/C + tStall) 
-
-'''
 def fctf(X, a, b, c, d):
     x,y,z = X
     SRU = 256000*8
@@ -31,7 +23,7 @@ def fctf(X, a, b, c, d):
         tau.append( a*x[k] + ( b * (y[k] /z[k] ) + som ) )
         som = 0
     return tau
-'''
+
 
 
 SRU = 256000 * 8 # bits
@@ -73,7 +65,7 @@ N_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+Nbr_echantillons,9]
 fct_simu_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+Nbr_echantillons,11]
 
 
-'''
+
 # Optimisation 
 
 #initial guess for a et b
@@ -85,38 +77,3 @@ abcd = 2, SRU, S, S
 
 sol,cov = curve_fit(fctf, (RTT,N,C), fct_simu, abcd) 
 print(sol)
-'''
-
-# plot analytical model FIFO
-
-
-test =[]
-for l in range(start_line, start_line + Nbr_echantillons):
-    test.append(analytical_model(RTT[l],N[l],SRU, C[l]))
-
-plotFIFO, = plt.plot(t, test)
-
-
-# plot analytical model FQ
-
-
-test =[]
-for l in range(start_line_FQ, start_line_FQ + Nbr_echantillons):
-    test.append(analytical_model(RTT_FQ[l],N_FQ[l],SRU, C_FQ[l]))
-
-plotFQ, = plt.plot(t, test)
-
-
-
-# plot analytical model DCTCP
-
-
-test =[]
-for l in range(start_line_DCTCP, start_line_DCTCP + Nbr_echantillons):
-    test.append(analytical_model(RTT_DCTCP[l],N_DCTCP[l],SRU, C_DCTCP[l]))
-
-plotDCTCP, = plt.plot(t, test)
-
-plt.legend([plotFIFO,plotFQ, plotDCTCP],["analytique FIFO", "Analytique FQ", "Analytique DCTCP"])
-
-plt.show()
