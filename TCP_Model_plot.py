@@ -6,25 +6,50 @@ from pandas_ods_reader import read_ods
 # close all figure
 plt.close("all")
 
-# getData -> CSV
-nb_iteration = 5200 #total lignes calc = 15493
-
 SRU = 256000 * 8 # bits
 S = 1446 * 8 # bits
 
+# vecteur temporel
+nb_iteration = 5200 #total lignes calc = 15493
+offset = 0 # first line of read
 t = np.arange(nb_iteration)
 
-data = pd.read_csv('incast_all.csv')
+# getData -> CSV
+data = pd.read_csv('simus.csv')
 
 #test1 = read_ods("tableur_projet.ods",4)
 
-N = data.iloc[0:nb_iteration,9]
-C = 1e6 * data.iloc[0:nb_iteration, 5]
-B = data.iloc[0:nb_iteration, 8]
-RTT = 1e-3 * data.iloc[0:nb_iteration, 6]
-RTO = 1e-3 * data.iloc[0:nb_iteration, 4]
 
-fct_simu = 1e-3 * data.iloc[0:nb_iteration,11]
+#donnees pour FIFO
+start_line = 0 + offset
+if ( start_line+nb_iteration > 15491):
+    print('youve exceeded number of lines')
+RTT = 1e-3 * data.iloc[start_line:start_line+nb_iteration, 6]
+C = 1e6 * data.iloc[start_line:start_line+nb_iteration, 5]
+N = data.iloc[start_line:start_line+nb_iteration,9]
+RTO = data.iloc[start_line:start_line+nb_iteration, 4]
+fct_simu = 1e-3 * data.iloc[start_line:start_line+nb_iteration,11]
+
+#donnees pour FQ
+start_line_FQ = 15492 + offset
+if ( start_line_FQ+nb_iteration > 30993):
+    print('youve exceeded number of lines')
+RTT_FQ = 1e-3 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 6]
+C_FQ = 1e6 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 5]
+N_FQ = data.iloc[start_line_FQ:start_line_FQ+nb_iteration,9]
+fct_simu_FQ = 1e-3 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration,11]
+RTO_FQ = data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 4]
+
+#donnees DCTCP-RED-ECN
+start_line_DCTCP = 30994 + offset
+if ( start_line_DCTCP+nb_iteration > 46580):
+    print('youve exceeded number of lines')
+RTT_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 6]
+C_DCTCP = 1e6 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 5]
+N_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration,9]
+fct_simu_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration,11]
+RTO_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 4]
+
 
 
 # calculs modele optimisé et modele 3
@@ -41,7 +66,7 @@ res1 = 0
 err3 = []
 err1op = []
 
-for i in range(nb_iteration) : #35
+for i in range(start_line, start_line + nb_iteration): #35
     res1 = ( int( (N[i] * SRU) / S) + 1 ) * (S/C)
     test1_cal.append(res1)
     mod1op.append((B1 * N[i] ) * B2 / C[i])
@@ -60,8 +85,8 @@ for i in range(nb_iteration) : #35
     res = (N[i]*SRU)//S + som + N[i]*178
     res = res*(S/C[i]) + 2*RTT[i]
     test3.append(res)
-    err1op.append(abs(mod1op[i]-fct_simu[i]))
-    err3.append(abs(test3[i] - fct_simu[i]))
+    err1op.append(abs(mod1op[i-start_line]-fct_simu[i]))
+    err3.append(abs(test3[i-start_line] - fct_simu[i]))
 
 # plot modeles, erreur
 
@@ -79,6 +104,6 @@ plot2, = plt.plot(t, fct_simu)
 plt.legend([plot1,plot2],["Modele 1 optimisé", "Modele de simulation"])
 
 
-plt.xlim(5100,5200)
+plt.xlim(nb_iteration - 100,nb_iteration)
 
 plt.show()

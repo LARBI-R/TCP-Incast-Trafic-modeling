@@ -89,12 +89,9 @@ print(sol)
 
 # plot analytical model FIFO
 
-RTT = RTT.tolist()
-N = N.tolist()
-C = C.tolist()
 
 test =[]
-for l in range(35):
+for l in range(start_line, start_line + Nbr_echantillons):
     test.append(analytical_model(RTT[l],N[l],SRU, C[l]))
 
 plotFIFO, = plt.plot(t, test)
@@ -102,12 +99,9 @@ plotFIFO, = plt.plot(t, test)
 
 # plot analytical model FQ
 
-RTT_FQ = RTT_FQ.tolist()
-N_FQ = N_FQ.tolist()
-C_FQ = C_FQ.tolist()
 
 test =[]
-for l in range(35):
+for l in range(start_line_FQ, start_line_FQ + Nbr_echantillons):
     test.append(analytical_model(RTT_FQ[l],N_FQ[l],SRU, C_FQ[l]))
 
 plotFQ, = plt.plot(t, test)
@@ -116,11 +110,9 @@ plotFQ, = plt.plot(t, test)
 
 # plot analytical model DCTCP
 
-RTT_DCTCP = RTT_DCTCP.tolist()
-N_DCTCP = N_DCTCP.tolist()
-C_DCTCP = C_DCTCP.tolist()
+
 test =[]
-for l in range(35):
+for l in range(start_line_DCTCP, start_line_DCTCP + Nbr_echantillons):
     test.append(analytical_model(RTT_DCTCP[l],N_DCTCP[l],SRU, C_DCTCP[l]))
 
 plotDCTCP, = plt.plot(t, test)
