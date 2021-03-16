@@ -29,6 +29,7 @@ data = pd.read_csv('simus.csv')
 
 #test1 = read_ods("tableur_projet.ods",4)
 
+    
 
 #donnees pour FIFO
 start_line = 0 + offset
@@ -37,8 +38,33 @@ if ( start_line+nb_iteration > 15491):
 RTT = 1e-3 * data.iloc[start_line:start_line+nb_iteration, 6]
 C = 1e6 * data.iloc[start_line:start_line+nb_iteration, 5]
 N = data.iloc[start_line:start_line+nb_iteration,9]
-RTO = data.iloc[start_line:start_line+nb_iteration, 4]
+RTO = 1e-3*data.iloc[start_line:start_line+nb_iteration, 4]
 fct_simu = 1e-3 * data.iloc[start_line:start_line+nb_iteration,11]
+B =  data.iloc[start_line:start_line+nb_iteration,8]
+
+
+count = 0
+N_new =[]
+lignes = []
+fct_simu_new = []
+for k in N:
+    if ( k > 20 ):
+        N_new.append(k)
+        lignes.append(count)
+    count = count + 1    
+
+for k in lignes:
+    fct_simu_new.append(fct_simu[k])
+
+C = C[0:len(lignes) ]
+B = B[0:len(lignes) ]
+RTT = RTT[0:len(lignes) ]
+RTO = RTO[0:len(lignes) ]
+N = N_new
+
+fct_simu = fct_simu_new
+t = np.arange(len(lignes))
+
 
 #donnees pour FQ
 start_line_FQ = 15492 + offset
@@ -48,7 +74,7 @@ RTT_FQ = 1e-3 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 6]
 C_FQ = 1e6 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 5]
 N_FQ = data.iloc[start_line_FQ:start_line_FQ+nb_iteration,9]
 fct_simu_FQ = 1e-3 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration,11]
-RTO_FQ = data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 4]
+RTO_FQ = 1e-3 * data.iloc[start_line_FQ:start_line_FQ+nb_iteration, 4]
 
 #donnees DCTCP-RED-ECN
 start_line_DCTCP = 30994 + offset
@@ -58,7 +84,7 @@ RTT_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 6]
 C_DCTCP = 1e6 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 5]
 N_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration,9]
 fct_simu_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration,11]
-RTO_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 4]
+RTO_DCTCP = 1e-3 * data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 4]
 
 
 # ------------------------ Reno - FIFO ------------------------ #
@@ -66,7 +92,14 @@ RTO_DCTCP = data.iloc[start_line_DCTCP:start_line_DCTCP+nb_iteration, 4]
 
 
 test =[]
-for l in range(start_line, start_line + nb_iteration):
+
+#start = start_line
+#to = start_line + nb_iteration
+
+start = 0
+to = len(lignes)
+
+for l in range(start, to):
     test.append(analytical_model(RTT[l],N[l],SRU, C[l]))
 
 plotAnalyFIFO, = plt.plot(t, test)
@@ -87,7 +120,7 @@ res1 = 0
 err3 = []
 err1op = []
 
-for i in range(start_line, start_line + nb_iteration): #35
+for i in range(start, to): #35
     res1 = ( int( (N[i] * SRU) / S) + 1 ) * (S/C)
     test1_cal.append(res1)
     mod1op.append((B1 * N[i] ) * B2 / C[i])
@@ -96,24 +129,30 @@ for i in range(start_line, start_line + nb_iteration): #35
 #        som = som + ( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) 
 #        print(( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) ).
     
-    repetition = (RTO[i])//(115.68*10**-6)
+    vit_trait_seg = S/C[i]
+
+    repetition = (RTO[i])//vit_trait_seg
+    print(repetition)
     
     som = 0
-    for k in range(int( ( (SRU)/(S) ) // (repetition))) :
-        #print(( int ( (SRU)/(S) ) + 1 ) - 86 *(k) - 86 - B[i] )
-        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B[i] )) 
+    test = int((int( ( (SRU)/(S) )+1 )//((repetition) + B[i])))
     
-    res = (N[i]*SRU)//S + som + N[i]*178
-    res = res*(S/C[i]) + 2*RTT[i]
+    for k in range(test) :
+        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B[i] ))
+    
+    res = int((SRU)/S)+1 + som
+    res = res*(N[i]*S/C[i]) + 2*RTT[i]
     test3.append(res)
+
+    
     err1op.append(abs(mod1op[i-start_line]-fct_simu[i]))
     err3.append(abs(test3[i-start_line] - fct_simu[i]))
 
 plotFIFO_mod3, = plt.plot(t, test3)
 plotsimuFIFO, = plt.plot(t, fct_simu)
-plotmodelOPT_FIFO, = plt.plot(t, mod1op)
+#plotmodelOPT_FIFO, = plt.plot(t, mod1op)
 
-plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["Modele optimisé FIFO",
+plt.legend([plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],[
                                                                     "Modele analytique FIFO", 
                                                                     "Modele 3 FIFO ", 
                                                                     "Modele de simulation FIFO"])
@@ -121,6 +160,7 @@ plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["Mod
 plt.xlim(nb_iteration - 35,nb_iteration)
 plt.show()
 
+"""
 # ------------------------ Reno - FQ ------------------------ #
 
 # Calcul modele analytique (PROF)
@@ -273,3 +313,4 @@ plt.show()
 
 
 plt.show()
+"""
