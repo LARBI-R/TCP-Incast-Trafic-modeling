@@ -20,8 +20,9 @@ SRU = 256000 * 8 # bits
 S = 1446 * 8 # bits
 
 # vecteur temporel
-nb_iteration = 35 #total lignes calc = 15493
+nb_iteration = 500 #total lignes calc = 15493
 offset = 0 # first line of read
+Nmax = 50
 t = np.arange(nb_iteration)
 
 # getData -> CSV
@@ -48,21 +49,29 @@ N_new =[]
 lignes = []
 fct_simu_new = []
 for k in N:
-    if ( k > 20 ):
+    if ( k > Nmax ):
         N_new.append(k)
         lignes.append(count)
     count = count + 1    
+C_new = []
+B_new = []
+RTT_new = []
+RTO_new = []
 
 for k in lignes:
     fct_simu_new.append(fct_simu[k])
+    C_new.append(C[k])
+    B_new.append(B[k])
+    RTT_new.append(RTT[k])
+    RTO_new.append(RTO[k])
 
-C = C[0:len(lignes) ]
-B = B[0:len(lignes) ]
-RTT = RTT[0:len(lignes) ]
-RTO = RTO[0:len(lignes) ]
+C = C_new
+B = B_new
+RTT = RTT_new
+RTO = RTO_new
 N = N_new
-
 fct_simu = fct_simu_new
+
 t = np.arange(len(lignes))
 
 
@@ -121,7 +130,7 @@ err3 = []
 err1op = []
 
 for i in range(start, to): #35
-    res1 = ( int( (N[i] * SRU) / S) + 1 ) * (S/C)
+    res1 = ( int( (N[i] * SRU) / S) + 1 ) * (S/C[i])
     test1_cal.append(res1)
     mod1op.append((B1 * N[i] ) * B2 / C[i])
 #    
@@ -157,7 +166,8 @@ plt.legend([plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],[
                                                                     "Modele 3 FIFO ", 
                                                                     "Modele de simulation FIFO"])
 
-plt.xlim(nb_iteration - 35,nb_iteration)
+#plt.xlim(nb_iteration - 35,nb_iteration)
+plt.xlim(len(lignes) - 35,len(lignes))
 plt.show()
 
 """
