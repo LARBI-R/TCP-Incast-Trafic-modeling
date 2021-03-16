@@ -20,7 +20,7 @@ SRU = 256000 * 8 # bits
 S = 1446 * 8 # bits
 
 # vecteur temporel
-nb_iteration = 35 #total lignes calc = 15493
+nb_iteration = 50 #total lignes calc = 15493
 offset = 0 # first line of read
 t = np.arange(nb_iteration)
 
@@ -37,8 +37,9 @@ if ( start_line+nb_iteration > 15491):
 RTT = 1e-3 * data.iloc[start_line:start_line+nb_iteration, 6]
 C = 1e6 * data.iloc[start_line:start_line+nb_iteration, 5]
 N = data.iloc[start_line:start_line+nb_iteration,9]
-RTO = data.iloc[start_line:start_line+nb_iteration, 4]
+RTO = 1e-3*data.iloc[start_line:start_line+nb_iteration, 4]
 fct_simu = 1e-3 * data.iloc[start_line:start_line+nb_iteration,11]
+B =  data.iloc[start_line:start_line+nb_iteration,8]
 
 #donnees pour FQ
 start_line_FQ = 15492 + offset
@@ -96,16 +97,22 @@ for i in range(start_line, start_line + nb_iteration): #35
 #        som = som + ( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) 
 #        print(( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) ).
     
-    repetition = (RTO[i])//(115.68*10**-6)
+    vit_trait_seg = S/C[i]
+
+    repetition = (RTO[i])//vit_trait_seg
+    print(repetition)
     
     som = 0
-    for k in range(int( ( (SRU)/(S) ) // (repetition))) :
-        #print(( int ( (SRU)/(S) ) + 1 ) - 86 *(k) - 86 - B[i] )
-        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B[i] )) 
+    test = int((int( ( (SRU)/(S) )+1 )//((repetition) + B[i])))
     
-    res = (N[i]*SRU)//S + som + N[i]*178
-    res = res*(S/C[i]) + 2*RTT[i]
+    for k in range(test) :
+        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B[i] ))
+    
+    res = int((SRU)/S)+1 + som
+    res = res*(N[i]*S/C[i]) + 2*RTT[i]
     test3.append(res)
+
+    
     err1op.append(abs(mod1op[i-start_line]-fct_simu[i]))
     err3.append(abs(test3[i-start_line] - fct_simu[i]))
 
@@ -121,6 +128,7 @@ plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["Mod
 plt.xlim(nb_iteration - 35,nb_iteration)
 plt.show()
 
+"""
 # ------------------------ Reno - FQ ------------------------ #
 
 # Calcul modele analytique (PROF)
@@ -273,3 +281,4 @@ plt.show()
 
 
 plt.show()
+"""
