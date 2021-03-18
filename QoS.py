@@ -1,46 +1,113 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
+# @retval 0 si mediocre
+#		  1 si TRES MAUVAIS
+#		  2 si MAUVAIS
+#		  3 si MOYEN
+#		  4 si BON
+#		  5 si TRES BON
+#		  6 si EXCELLENT
 
-def qos(N, C, fct):
+def qos(N, C, RTT, RTO, B, fct):
 
+	S = 1446 * 8 # bits
 	SRU= 256000 *8	#en bits
 
 	TempsReelViaSimulation = fct
-	TempsTheoriqueSansCongestion=N*SRU/C
-	diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
-	PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
-	MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
+
+	#TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
+
+	vit_trait_seg = S/C
+	repetition = (RTO)//vit_trait_seg
+	som = 0
+
+	test = int((int( ( (SRU)/(S) )+1 )//((repetition) + B)))
+
+	for k in range(test) :
+		som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B ))
+
+	res = int((SRU)/S)+1 + som
+	res = res*(N*S/C) + 2*RTT
+
+	#diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
+
+	diff = np.abs(TempsReelViaSimulation - res )	
+
+	#PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
+
+	PourcentageDeTempsTheorique = diff*100/res
+
+	#MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
+
+	MultiplicateurDeTemps = 1 + res/100
+
 
 	if(MultiplicateurDeTemps<1.5):
-		print("EXCELLENT")
+		return 6
 
 	elif(MultiplicateurDeTemps<2.5):
-		print("TRES BON")
+		return 5
 
 	elif(MultiplicateurDeTemps<5):
-		print("BON")
+		return 4
 
 	elif(MultiplicateurDeTemps<10):
-		print("MOYEN")
+		return 3
 
 	elif(MultiplicateurDeTemps<20):
-		print("MAUVAIS")
+		return 2
 
 	elif(MultiplicateurDeTemps<30):
-		print("TRES MAUVAIS")
+		return 1
 	else :
-		print("MEDIOCRE")
+		return 0
 
 
+#test1 = read_ods("tableur_projet.ods",4)
 
-data = pd.read_csv('incast_all.csv')
+#read tableur
+data = pd.read_csv('simus.csv')
 
-C = 1e6 * data.iloc[:, 5]
-N = data.iloc[:,9]
-fct_simu = 1e-3 * data.iloc[:,11]
+#donnees pour FIFO
+
+RTT = 1e-3 * data.iloc[0:15491, 6]
+C = 1e6 * data.iloc[0:15491, 5]
+N = data.iloc[0:15491,9]
+RTO = 1e-3*data.iloc[0:15491, 4]
+fct_simu = 1e-3 * data.iloc[0:15491,11]
+B =  data.iloc[0:15491,8]
+
+nbmediocre = 0
+nbTRESMAUVAIS = 0
+nbMAUVAIS = 0
+nbMOYEN = 0
+nbBON = 0
+nbTRESBON = 0
+nbexcellent	= 0
  
-for k in range(8):
-	qos(N[k],C[k],fct_simu[k])
+for k in range(15491):
+	a = qos(N[k],C[k],RTT[k], RTO[k], B[k], fct_simu[k])
+	if a == 6:
+		nbexcellent += 1
+	elif a == 5:
+		nbTRESBON += 1
+	elif a == 4:
+		nbBON += 1
+	elif a == 3:
+		nbMOYEN += 1
+	elif a == 2:
+		nbMAUVAIS += 1
+	elif a == 1:
+		nbTRESMAUVAIS += 1
+	elif a == 0:
+		nbmediocre += 1
 
+print('nbexcellent = ' + str(nbexcellent))
+print('nbTRESBON = ' + str(nbTRESBON))
+print('nbBON = ' + str(nbBON))
+print('nbMOYEN = ' + str(nbMOYEN))
+print('nbTRESMAUVAIS = ' + str(nbTRESMAUVAIS))
+print('nbmediocre = ' + str(nbmediocre))

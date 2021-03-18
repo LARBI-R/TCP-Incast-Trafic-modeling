@@ -19,11 +19,13 @@ plt.close("all")
 SRU = 256000 * 8 # bits
 S = 1446 * 8 # bits
 
+# --------------------------- Parametres --------------------------- #
 # vecteur temporel
 nb_iteration = 500 #total lignes calc = 15493
 offset = 0 # first line of read
-Nmax = 50
+Nmax = 64
 t = np.arange(nb_iteration)
+# --------------------------- Fin Parametres --------------------------- #
 
 # getData -> CSV
 data = pd.read_csv('simus.csv')
