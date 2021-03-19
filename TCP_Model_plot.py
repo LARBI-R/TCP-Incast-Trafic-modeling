@@ -4,13 +4,35 @@ import numpy as np
 from pandas_ods_reader import read_ods
 import math
 
+
+def Modele3(N, C, RTT, RTO, B):
+
+    S = 1446 * 8 # bits
+    SRU= 256000 *8	#en bits
+
+    vit_trait_seg = S/C
+
+    repetition = (RTO)//vit_trait_seg
+    print(repetition)
+
+    som = 0
+    test = int((int( ( (SRU)/(S) )+1 )//((repetition) + B)))
+
+    for k in range(test) :
+        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B ))
+
+    res = int((SRU)/S)+1 + som
+    res = res*(N*S/C) + 2*RTT
+
+    return res
+
+
 def analytical_model(RTT, N, SRU, C):    
     k = math.ceil(math.log((N*SRU/S)+1,2))
     tStall = 0
     for k in range(1, k):
         tStall = tStall + max((S/C +RTT - (2**(k-1)*S/C)), 0)
     return (2*RTT + N*SRU/C + tStall) 
-
 
 
 # close all figure
@@ -23,7 +45,7 @@ S = 1446 * 8 # bits
 # vecteur temporel
 nb_iteration = 500 #total lignes calc = 15493
 offset = 0 # first line of read
-Nmax = 64
+Nmax = 65
 t = np.arange(nb_iteration)
 # --------------------------- Fin Parametres --------------------------- #
 
@@ -140,19 +162,7 @@ for i in range(start, to): #35
 #        som = som + ( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) 
 #        print(( ( int ( (N[i]*SRU)/(S) ) + 1 ) - 86 *(k-1) - 86*k - B[i] ) * ( S/C ) ).
     
-    vit_trait_seg = S/C[i]
-
-    repetition = (RTO[i])//vit_trait_seg
-    print(repetition)
-    
-    som = 0
-    test = int((int( ( (SRU)/(S) )+1 )//((repetition) + B[i])))
-    
-    for k in range(test) :
-        som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B[i] ))
-    
-    res = int((SRU)/S)+1 + som
-    res = res*(N[i]*S/C[i]) + 2*RTT[i]
+    res = Modele3(N[i], C[i], RTT[i], RTO[i], B[i])
     test3.append(res)
 
     
@@ -161,9 +171,9 @@ for i in range(start, to): #35
 
 plotFIFO_mod3, = plt.plot(t, test3)
 plotsimuFIFO, = plt.plot(t, fct_simu)
-#plotmodelOPT_FIFO, = plt.plot(t, mod1op)
+plotmodelOPT_FIFO, = plt.plot(t, mod1op)
 
-plt.legend([plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],[
+plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],[ "Modele optimisé",
                                                                     "Modele analytique FIFO", 
                                                                     "Modele 3 FIFO ", 
                                                                     "Modele de simulation FIFO"])
