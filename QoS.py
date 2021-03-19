@@ -11,14 +11,9 @@ import math
 #		  5 si TRES BON
 #		  6 si EXCELLENT
 
-def qos(N, C, RTT, RTO, B, fct):
-
+def Modele3(N, C, RTT, RTO, B):
 	S = 1446 * 8 # bits
 	SRU= 256000 *8	#en bits
-
-	TempsReelViaSimulation = fct
-
-	#TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
 
 	vit_trait_seg = S/C
 	repetition = (RTO)//vit_trait_seg
@@ -31,19 +26,26 @@ def qos(N, C, RTT, RTO, B, fct):
 
 	res = int((SRU)/S)+1 + som
 	res = res*(N*S/C) + 2*RTT
+	return res
 
-	#diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
+def qos(N, C, RTT, RTO, B, fct):
 
-	diff = np.abs(TempsReelViaSimulation - res )	
+	S = 1446 * 8 # bits
+	SRU= 256000 *8	#en bits
 
-	#PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
+	res = Modele3(N, C, RTT, RTO, B)
 
-	PourcentageDeTempsTheorique = diff*100/res
+	TempsReelViaSimulation = fct
 
-	#MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
+	#TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
+	
+	TempsTheoriqueSansCongestion = res
+	
+	diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
 
-	MultiplicateurDeTemps = 1 + res/100
+	PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
 
+	MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
 
 	if(MultiplicateurDeTemps<1.5):
 		return 6
@@ -73,12 +75,12 @@ data = pd.read_csv('simus.csv')
 
 #donnees pour FIFO
 
-RTT = 1e-3 * data.iloc[0:15491, 6]
-C = 1e6 * data.iloc[0:15491, 5]
-N = data.iloc[0:15491,9]
-RTO = 1e-3*data.iloc[0:15491, 4]
-fct_simu = 1e-3 * data.iloc[0:15491,11]
-B =  data.iloc[0:15491,8]
+RTT = 1e-3 * data.iloc[0:15492, 6]
+C = 1e6 * data.iloc[0:15492, 5]
+N = data.iloc[0:15492,9]
+RTO = 1e-3*data.iloc[0:15492, 4]
+fct_simu = 1e-3 * data.iloc[0:15492,11]
+B =  data.iloc[0:15492,8]
 
 nbmediocre = 0
 nbTRESMAUVAIS = 0
@@ -88,8 +90,10 @@ nbBON = 0
 nbTRESBON = 0
 nbexcellent	= 0
  
-for k in range(15491):
+for k in range(15492):
+
 	a = qos(N[k],C[k],RTT[k], RTO[k], B[k], fct_simu[k])
+	
 	if a == 6:
 		nbexcellent += 1
 	elif a == 5:
@@ -109,5 +113,7 @@ print('nbexcellent = ' + str(nbexcellent))
 print('nbTRESBON = ' + str(nbTRESBON))
 print('nbBON = ' + str(nbBON))
 print('nbMOYEN = ' + str(nbMOYEN))
+print('nbMauvais = ' + str(nbMAUVAIS))
 print('nbTRESMAUVAIS = ' + str(nbTRESMAUVAIS))
 print('nbmediocre = ' + str(nbmediocre))
+
