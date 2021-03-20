@@ -33,37 +33,38 @@ def qos(N, C, RTT, RTO, B, fct):
 	S = 1446 * 8 # bits
 	SRU= 256000 *8	#en bits
 
-	res = Modele3(N, C, RTT, RTO, B)
+	#res = Modele3(N, C, RTT, RTO, B)
 
 	TempsReelViaSimulation = fct
-
-	#TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
 	
-	TempsTheoriqueSansCongestion = res
+	#TempsReelViaSimulation = res
+
+	TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
 	
-	diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
+	#TempsTheoriqueSansCongestion = res
 
-	PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
+	#diff = np.abs(TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
+	diff = (TempsReelViaSimulation - TempsTheoriqueSansCongestion )	
 
-	MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
+	#PourcentageDeTempsTheorique = diff*100/TempsTheoriqueSansCongestion
 
-	if(MultiplicateurDeTemps<1.5):
+	#MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
+	MultiplicateurDeTemps = diff
+
+	if(MultiplicateurDeTemps<0.002):
 		return 6
 
-	elif(MultiplicateurDeTemps<2.5):
+	elif(MultiplicateurDeTemps<0.02):
 		return 5
 
-	elif(MultiplicateurDeTemps<5):
+	elif(MultiplicateurDeTemps<0.2):
 		return 4
 
-	elif(MultiplicateurDeTemps<10):
+	elif(MultiplicateurDeTemps<1):
 		return 3
 
-	elif(MultiplicateurDeTemps<20):
+	elif(MultiplicateurDeTemps<3):
 		return 2
-
-	elif(MultiplicateurDeTemps<30):
-		return 1
 	else :
 		return 0
 
@@ -104,8 +105,8 @@ for k in range(15492):
 		nbMOYEN += 1
 	elif a == 2:
 		nbMAUVAIS += 1
-	elif a == 1:
-		nbTRESMAUVAIS += 1
+	#elif a == 1:
+	#	nbTRESMAUVAIS += 1
 	elif a == 0:
 		nbmediocre += 1
 
@@ -114,6 +115,6 @@ print('nbTRESBON = ' + str(nbTRESBON))
 print('nbBON = ' + str(nbBON))
 print('nbMOYEN = ' + str(nbMOYEN))
 print('nbMauvais = ' + str(nbMAUVAIS))
-print('nbTRESMAUVAIS = ' + str(nbTRESMAUVAIS))
+#print('nbTRESMAUVAIS = ' + str(nbTRESMAUVAIS))
 print('nbmediocre = ' + str(nbmediocre))
 
