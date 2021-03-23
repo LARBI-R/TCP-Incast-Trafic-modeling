@@ -20,7 +20,7 @@ SRU = 256000 * 8 # bits
 S = 1446 * 8 # bits
 
 # vecteur temporel
-nb_iteration = 50 #total lignes calc = 15493
+nb_iteration = 3000 #total lignes calc = 15493
 offset = 0 # first line of read
 t = np.arange(nb_iteration)
 
@@ -126,6 +126,9 @@ plt.legend([plotmodelOPT_FIFO, plotAnalyFIFO, plotFIFO_mod3, plotsimuFIFO],["Mod
                                                                     "Modele de simulation FIFO"])
 
 plt.xlim(nb_iteration - 35,nb_iteration)
+plt.xlim(1507,1509)
+plt.ylim(0.9,1.1)
+plt.ylabel("temps (s)")
 plt.show()
 
 """
