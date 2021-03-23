@@ -39,7 +39,7 @@ def qos(N, C, RTT, RTO, B, fct):
 	
 	#TempsReelViaSimulation = res
 
-	TempsTheoriqueSansCongestion= N*SRU/C + 2* RTT
+	TempsTheoriqueSansCongestion= N*(SRU/C + 2* RTT)
 	
 	#TempsTheoriqueSansCongestion = res
 
@@ -50,20 +50,23 @@ def qos(N, C, RTT, RTO, B, fct):
 
 	#MultiplicateurDeTemps = 1 + PourcentageDeTempsTheorique/100
 	MultiplicateurDeTemps = diff
-
-	if(MultiplicateurDeTemps<0.002):
+	
+	if (MultiplicateurDeTemps < 0):
+		return 6	
+	
+	elif(MultiplicateurDeTemps<0.0002):
 		return 6
 
-	elif(MultiplicateurDeTemps<0.02):
+	elif(MultiplicateurDeTemps<0.002):
 		return 5
 
-	elif(MultiplicateurDeTemps<0.2):
+	elif(MultiplicateurDeTemps<0.02):
 		return 4
 
-	elif(MultiplicateurDeTemps<1):
+	elif(MultiplicateurDeTemps<0.2):
 		return 3
 
-	elif(MultiplicateurDeTemps<3):
+	elif(MultiplicateurDeTemps<1):
 		return 2
 	else :
 		return 0

@@ -22,7 +22,7 @@ def Modele3(N, C, RTT, RTO, B):
         som = som + (( ( int ( (SRU)/(S) ) + 1 ) - repetition *(k) - repetition - B ))
 
     res = int((SRU)/S)+1 + som
-    res = res*(N*S/C) + 2*RTT
+    res = res*(N*S/C) + 2*RTT*N
 
     return res
 
